@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'user_info' => [
+        'url' => env('USER_INFO_URL', 'https://user-info.herokuapp.com'),
+        'enabled' => env('USER_INFO_ENABLED', true),
+        'timeout' => (int) env('USER_INFO_TIMEOUT', 5),
+    ],
+
 ];

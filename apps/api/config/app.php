@@ -56,6 +56,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Callback Domain
+    |--------------------------------------------------------------------------
+    |
+    | Base domain used to build callback URLs in UI messages
+    | (FORM and SELECTION screens from Annex 1 of the challenge).
+    | Allows pointing an emulator/physical device at the same backend
+    | without code changes.
+    |
+    */
+
+    'callback_domain' => env('APP_CALLBACK_DOMAIN', env('APP_URL', 'http://localhost')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
