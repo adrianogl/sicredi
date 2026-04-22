@@ -1,58 +1,84 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sicredi API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST pra gerenciar pautas (motions) e sessões de votação — teste técnico Sicredi.
 
-## About Laravel
+Stack: **Laravel 13 + PHP 8.3+ + MySQL 8.4 + Sail**. OpenAPI via [Scramble](https://scramble.dedoc.co).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+> O enunciado pedia Java + Spring Boot; resolvi ir de Laravel. As decisões de
+> arquitetura (e por que cada uma) estão no README da raiz do monorepo.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+> Código, tabelas, classes e payloads JSON estão em inglês. `motion` é o equivalente
+> técnico de "pauta" em assembleias (Robert's Rules of Order). O README tá em
+> pt-BR pra facilitar leitura.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Rodar
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Na raiz do monorepo:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+npm run setup:api   # .env, deps, containers, migrations
+npm run dev:api     # Sail em primeiro plano
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+A API sobe em `http://localhost:8000`.
 
-## Contributing
+## Endpoints (v1)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Docs interativos em http://localhost:8000/docs/api.
 
-## Code of Conduct
+| Método | URL | O que faz |
+| ------ | --- | --------- |
+| POST   | `/api/v1/motions` | Cria pauta |
+| GET    | `/api/v1/motions` | Lista pautas (paginado) |
+| POST   | `/api/v1/motions/{motion}/sessions` | Abre sessão (default 60s, `duration_seconds` opcional) |
+| POST   | `/api/v1/sessions/{session}/votes` | Registra voto (`member_id`, `option` = `Yes` ou `No`) |
+| GET    | `/api/v1/motions/{motion}/result` | Contagem Yes/No/total |
+| GET    | `/api/v1/ui/motions` | Tela SELECAO (Anexo 1) |
+| GET    | `/api/v1/ui/sessions/{session}/vote` | Tela FORMULARIO (Anexo 1) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Erros
 
-## Security Vulnerabilities
+| Status | Code | Quando rola |
+| ------ | ---- | ----------- |
+| 403 | `MEMBER_NOT_ELIGIBLE` | user-info disse `UNABLE_TO_VOTE` ou 404 |
+| 404 | — | Pauta ou sessão não existe |
+| 409 | `SESSION_CLOSED` | Tentou votar depois do `closes_at` |
+| 409 | `DUPLICATE_VOTE` | Membro já votou nessa sessão |
+| 422 | `VALIDATION_FAILED` | Payload inválido |
+| 503 | `EXTERNAL_SERVICE_UNAVAILABLE` | user-info fora do ar |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Variáveis de ambiente
 
-## License
+| Env | Default | O que é |
+| --- | ------- | ------- |
+| `APP_PORT` | `8000` | Porta do Sail |
+| `APP_CALLBACK_DOMAIN` | `http://localhost:8000` | Domínio das URLs que voltam nas mensagens do Anexo 1. **Troque pelo IP da máquina ao testar em celular.** |
+| `USER_INFO_URL` | `https://user-info.herokuapp.com` | Serviço de elegibilidade (Bônus 1) |
+| `USER_INFO_ENABLED` | `true` | Desliga a integração (útil em testes manuais) |
+| `USER_INFO_TIMEOUT` | `5` | Timeout em segundos |
+| `API_VERSION` | `1.0.0` | Versão exposta no OpenAPI |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Testes e qualidade
+
+```bash
+./vendor/bin/sail pest                                          # 23 testes
+./vendor/bin/sail php ./vendor/bin/phpstan analyse              # Larastan level 6
+./vendor/bin/sail php ./vendor/bin/pint                         # Pint
+```
+
+## Como o código está organizado
+
+```
+app/
+├── Enums/                  → VoteOption, MemberStatus
+├── Exceptions/             → exceções de domínio + render() pra HTTP
+├── Http/
+│   ├── Controllers/Api/    → single-action por recurso
+│   ├── Requests/           → validação (FormRequest)
+│   └── Resources/          → serialização JSON
+├── Models/                 → Motion, VotingSession, Vote
+├── Providers/              → bindings das interfaces de repositório
+├── Repositories/           → acesso a dados (Contracts/ + impls Eloquent)
+├── ScreenMessages/         → DTOs do Anexo 1 (FORMULARIO / SELECAO)
+└── Services/               → VoteService, UserInfoClient
+```
