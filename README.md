@@ -28,6 +28,6 @@ Ou individualmente: `npm run setup:api` / `npm run setup:front`.
 
 ## Dev
 
-- API: `npm run dev:api`
-- Front: `npm run dev:front`
+- API: `npm run dev:api` → http://localhost:8000
+- Front: `npm run dev:front` → http://localhost:3000
 - Ambos juntos: `npm run dev`
