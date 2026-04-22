@@ -10,6 +10,9 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "setup:api": "cd apps/api && cp -n .env.example .env || true && composer install --ignore-platform-reqs --no-scripts && ./vendor/bin/sail up -d && ./vendor/bin/sail artisan key:generate && ./vendor/bin/sail artisan migrate",
+    "setup:front": "cd apps/front && npm install",
+    "setup": "npm run setup:api && npm run setup:front",
     "dev:api": "cd apps/api && ./vendor/bin/sail up",
     "dev:front": "cd apps/front && npm run dev",
     "dev": "concurrently -n api,front -c blue,yellow \"npm:dev:api\" \"npm:dev:front\""

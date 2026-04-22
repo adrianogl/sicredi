@@ -16,6 +16,16 @@ nvm install
 nvm use
 ```
 
+## Setup
+
+Instala deps de API e front, sobe o Sail, gera APP_KEY e roda migrations:
+
+```bash
+npm run setup
+```
+
+Ou individualmente: `npm run setup:api` / `npm run setup:front`.
+
 ## Dev
 
 - API: `npm run dev:api`
