@@ -10,7 +10,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "dev:api": "cd apps/api && php artisan serve",
+    "dev:api": "cd apps/api && ./vendor/bin/sail up",
     "dev:front": "cd apps/front && npm run dev",
     "dev": "concurrently -n api,front -c blue,yellow \"npm:dev:api\" \"npm:dev:front\""
   },
