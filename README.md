@@ -3,7 +3,7 @@
 Teste técnico Sicredi em formato monorepo:
 
 - `apps/api` - API Laravel 13 rodando em Laravel Sail (Docker).
-- `apps/front` - cliente web em Next.js 16 (React 19, TS). O teste avalia só o backend; o front está aqui só pra eu conseguir dogfoodar a API.
+- `apps/front` - cliente web em Next.js 16 (React 19, TS).
 
 ## Antes de rodar
 
