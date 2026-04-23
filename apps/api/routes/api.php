@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Mock\UserInfoMockController;
 use App\Http\Controllers\Api\Motion\ListMotionsController;
 use App\Http\Controllers\Api\Motion\ShowMotionCreateFormController;
 use App\Http\Controllers\Api\Motion\ShowMotionsSelectionController;
@@ -24,3 +25,5 @@ Route::prefix('ui')->name('ui.')->group(function (): void {
     Route::get('motions/new', ShowMotionCreateFormController::class)->name('motions.new');
     Route::get('sessions/{session}/vote', ShowVoteFormController::class)->name('vote');
 });
+
+Route::get('mock/users/{cpf}', UserInfoMockController::class)->name('mock.user-info');
