@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Motion\ListMotionsController;
+use App\Http\Controllers\Api\Motion\ShowMotionCreateFormController;
 use App\Http\Controllers\Api\Motion\ShowMotionsSelectionController;
 use App\Http\Controllers\Api\Motion\StoreMotionController;
 use App\Http\Controllers\Api\Result\ShowMotionResultController;
@@ -20,5 +21,6 @@ Route::post('sessions/{session}/votes', StoreVoteController::class)->name('votes
 
 Route::prefix('ui')->name('ui.')->group(function (): void {
     Route::get('motions', ShowMotionsSelectionController::class)->name('motions');
+    Route::get('motions/new', ShowMotionCreateFormController::class)->name('motions.new');
     Route::get('sessions/{session}/vote', ShowVoteFormController::class)->name('vote');
 });

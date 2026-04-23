@@ -7,9 +7,15 @@ enum VoteOption: string
     case Yes = 'Yes';
     case No = 'No';
 
-    /** @return list<string> */
-    public static function values(): array
+    /**
+     * Label legível para o associado (usado nas mensagens de UI do Anexo 1).
+     * O value do enum continua em inglês porque é o contrato da API.
+     */
+    public function label(): string
     {
-        return array_map(fn (self $c) => $c->value, self::cases());
+        return match ($this) {
+            self::Yes => 'Sim',
+            self::No => 'Não',
+        };
     }
 }

@@ -32,16 +32,27 @@ class ShowVoteFormController extends Controller
             new FieldItem(FieldType::Text, 'ID do associado', 'member_id'),
         ];
 
-        $buttons = array_map(
-            fn (VoteOption $option) => new ButtonItem(
-                text: $option->value,
-                url: CallbackUrl::to("/api/v1/sessions/{$session->id}/votes").'?option='.urlencode($option->value),
+        $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
+
+        $buttons = array_merge(
+            [
+                new ButtonItem(
+                    text: 'Cancelar',
+                    url: $frontendUrl.'/motions',
+                    method: 'GET',
+                ),
+            ],
+            array_map(
+                fn (VoteOption $option) => new ButtonItem(
+                    text: $option->label(),
+                    url: CallbackUrl::to("/api/v1/sessions/{$session->id}/votes").'?option='.urlencode($option->value),
+                ),
+                VoteOption::cases(),
             ),
-            VoteOption::cases(),
         );
 
         return (new FormMessage(
-            title: "Votar na sessao #{$session->id}",
+            title: "Votar na sessão #{$session->id}",
             items: $items,
             buttons: $buttons,
         ))->toArray();

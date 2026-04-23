@@ -40,7 +40,7 @@ class ShowMotionsSelectionController extends Controller
             ->all();
 
         return (new SelectionMessage(
-            title: 'Selecione uma pauta para abrir uma sessao de votacao',
+            title: 'Selecione uma pauta para abrir uma sessão de votação',
             items: $items,
         ))->toArray();
     }

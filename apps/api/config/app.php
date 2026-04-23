@@ -70,6 +70,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URL
+    |--------------------------------------------------------------------------
+    |
+    | Absolute URL of the web client used when a UI message needs to point
+    | back at a front-end route (ex.: "Cancelar" button navigating to the
+    | motion list). Kept configurable so emulator/physical device scenarios
+    | can override it.
+    |
+    */
+
+    'frontend_url' => env('APP_FRONTEND_URL', 'http://localhost:3000'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
