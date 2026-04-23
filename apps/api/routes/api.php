@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\Mock\UserInfoMockController;
-use App\Http\Controllers\Api\Motion\ListMotionsController;
 use App\Http\Controllers\Api\Motion\ShowMotionCreateFormController;
 use App\Http\Controllers\Api\Motion\ShowMotionsSelectionController;
 use App\Http\Controllers\Api\Motion\StoreMotionController;
@@ -12,7 +11,6 @@ use App\Http\Controllers\Api\VotingSession\OpenVotingSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('motions')->name('motions.')->group(function (): void {
-    Route::get('/', ListMotionsController::class)->name('index');
     Route::post('/', StoreMotionController::class)->name('store');
     Route::get('{motion}/result', ShowMotionResultController::class)->name('result');
     Route::post('{motion}/sessions', OpenVotingSessionController::class)->name('sessions.store');

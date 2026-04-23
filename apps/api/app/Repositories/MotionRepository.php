@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Motion;
 use App\Repositories\Contracts\MotionRepositoryInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -23,14 +22,6 @@ class MotionRepository implements MotionRepositoryInterface
         ]);
 
         return $motion;
-    }
-
-    /**
-     * @return LengthAwarePaginator<int, Motion>
-     */
-    public function paginate(int $perPage = 15): LengthAwarePaginator
-    {
-        return Motion::query()->latest()->paginate($perPage);
     }
 
     /**
