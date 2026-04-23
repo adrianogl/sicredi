@@ -39,7 +39,7 @@ O requisito pedia Java + Spring Boot. Fui de Laravel por produtividade e confort
 
 ### Organização do código
 
-- **Controllers single-action** (`__invoke`) agrupados por recurso em `app/Http/Controllers/Api/<Recurso>/`. Nomes verbais tipo `ListMotionsController`, `StoreMotionController` - cada classe cuida de uma ação só.
+- **Controllers single-action** (`__invoke`) agrupados por recurso em `app/Http/Controllers/Api/<Recurso>/`. Nomes verbais tipo `StoreMotionController`, `ShowMotionResultController` - cada classe cuida de uma ação só.
 - **Repositories** em `app/Repositories/` com interfaces em `Contracts/`. Não é default Laravel, mas deixa fácil mockar dependências nos testes unitários.
 - **Service só onde precisa.** Se a classe ia ser um "chama repo e loga", fica no controller mesmo. Sobraram `VoteService` (regra de voto) e `UserInfoClient` (HTTP externo).
 
@@ -88,3 +88,41 @@ Não tem ferramenta de benchmark, o escopo fica mais enxuto sem. A parte que imp
 - **PHPStan level 6** + Larastan
 - **Pint** (PSR-12 extended) - código sempre formatado.
 - **Pest** como runner.
+
+---
+
+### Front
+
+O `apps/front` é Next.js 16 (App Router) + React 19 + TS strict + TailwindCSS 4 + shadcn/ui + TanStack Query v5 + Jest + RTL. É um **cliente "sem lógica"**: consome as mensagens JSON e renderiza genericamente.
+
+#### Telas
+
+| Rota | Endpoint                           | O que renderiza |
+|---|------------------------------------|---|
+| `/` | -                                  | redirect server-side → `/motions` |
+| `/motions` | `GET /api/v1/ui/motions`           | tela `SELECAO` + botão "Nova pauta" |
+| `/motions/new` | `GET /api/v1/ui/motions/new`       | tela `FORMULARIO` de cadastro |
+| `/sessions/:id/vote` | `GET /api/v1/ui/sessions/:id/vote` | tela `FORMULARIO` de voto |
+
+#### Como funciona
+
+1. Cada página chama `useScreenMessage(path)` (React Query) e recebe `{tipo, titulo, itens, botoes…}`.
+2. Um renderer genérico (`SelectionScreen` / `FormScreen`) monta a UI a partir do `tipo`.
+3. Ao clicar num botão:
+   - **padrão** → POST pra `button.url` com o estado do form no body.
+   - **`metodo: 'GET'`** (extensão ao Anexo 1 para Cancelar) → extrai o pathname e navega via Next router.
+
+#### Decisões rápidas
+
+- **shadcn/ui + Tailwind puro** em vez de MUI. Bundle leve, são só 5 componentes.
+- **`fetch` + wrapper fino** em `lib/api.ts` (sem axios — não tem auth pra justificar).
+- **`useState` ad-hoc** pros forms (2-3 campos cada); sem react-hook-form/zod.
+- **`@base-ui/react`** é o primitivo novo do shadcn no Next 16 - **não tem `asChild`**. Quando preciso de link com cara de botão, uso `<Link className={buttonVariants()}>`.
+
+#### Mock do Bonus 1
+
+O Heroku original do Bonus 1 (`user-info.herokuapp.com`) estava fora do ar. Pra não depender dele, o próprio backend serve um mock em `GET /api/v1/mock/users/{cpf}`: aleatório entre `ABLE_TO_VOTE` / `UNABLE_TO_VOTE`; retorna 404 quando o CPF termina em `000` (pra você exercitar esse branch). `USER_INFO_URL` no `.env` já aponta pra ele.
+
+#### Testes
+
+`npm -w apps/front test` → **23 testes** em Jest + RTL. `lib/api`, hook de query, e cada componente de tela. Mocka HTTP e `next/navigation`; nenhum teste bate em servidor real.
